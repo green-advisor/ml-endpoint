@@ -1,6 +1,8 @@
 const fastify = require('fastify');
 const tf = require('@tensorflow/tfjs-node');
 const fs = require('fs');
+const fetch = require('node-fetch');
+
 
 const app = fastify();
 const port = 3000;
@@ -23,12 +25,35 @@ async function loadImage(imagePath) {
     return expandedImage;
 }
 
+
+async function downloadImage(url, filePath) {
+    try {
+        const response = await fetch(url);
+        const buffer = await response.buffer();
+        fs.writeFileSync(filePath, buffer);
+        console.log('Image downloaded successfully.');
+    } catch (error) {
+        console.error(`Error downloading the image: ${error}`);
+        throw error;
+    }
+}
+
 // Mendefinisikan fungsi untuk melakukan prediksi gambar menggunakan model
 async function predictImage(model, image) {
+
+
+    // banana 3, kopi 2, potato 6, tobaco 5
+
+    const label = ['belum',
+        'kopi',
+        'banana',
+        'belum',
+        'tobaco',
+        'potato'];
+
     const prediction = await model.predict(image);
     const output = prediction.argMax(1).arraySync()[0];
-    // const output = prediction.dataSync();
-    return output;
+    return label[output];
 }
 
 app.get('/', async (request, reply) => {
@@ -37,10 +62,16 @@ app.get('/', async (request, reply) => {
 
 
 // Endpoint untuk prediksi gambar
-app.post('/predict', async (req, res) => {
-    const imagePath = 'url gambar';
+app.get('/predict', async (req, res) => {
+
+
+    let imageurl = req.query.imageurl;
+    let imagename = req.query.imagename;
+    let imagePath = `tmp/gambar/${imagename}.jpg`
 
     try {
+        downloadImage(imageurl, imagePath)
+
         // Memuat model
         const modelPath = 'tmp/tfjs_model/model.json';
         const model = await loadModel(modelPath);
@@ -53,6 +84,9 @@ app.post('/predict', async (req, res) => {
 
         // Mengirimkan hasil prediksi sebagai respons
         res.send({ prediction: output });
+
+
+
     } catch (err) {
         console.error('Terjadi kesalahan:', err);
         res.status(500).send({ error: 'Terjadi kesalahan saat memproses permintaan' });

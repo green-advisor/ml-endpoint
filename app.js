@@ -40,20 +40,9 @@ async function downloadImage(url, filePath) {
 
 // Mendefinisikan fungsi untuk melakukan prediksi gambar menggunakan model
 async function predictImage(model, image) {
-
-
-    // banana 3, kopi 2, potato 6, tobaco 5
-
-    const label = ['belum',
-        'kopi',
-        'banana',
-        'belum',
-        'tobaco',
-        'potato'];
-
     const prediction = await model.predict(image);
     const output = prediction.argMax(1).arraySync()[0];
-    return label[output];
+    return output;
 }
 
 app.get('/', async (request, reply) => {
@@ -84,13 +73,23 @@ app.get('/predict', async (req, res) => {
 
         // Mengirimkan hasil prediksi sebagai respons
         res.send({ prediction: output });
-
-
-
     } catch (err) {
         console.error('Terjadi kesalahan:', err);
         res.status(500).send({ error: 'Terjadi kesalahan saat memproses permintaan' });
     }
+
+
+    fs.unlink(imagePath, (err) => {
+        if (err) {
+            console.error(err);
+            return;
+        }
+
+        console.log('File berhasil dihapus!');
+    });
+
+
+
 });
 
 // Menjalankan server pada port yang ditentukan

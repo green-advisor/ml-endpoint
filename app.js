@@ -40,9 +40,21 @@ async function downloadImage(url, filePath) {
 
 // Mendefinisikan fungsi untuk melakukan prediksi gambar menggunakan model
 async function predictImage(model, image) {
+
+    const datatanaman = ['Banana',
+        'Coffee',
+        'Corn',
+        'Grape',
+        'Guava',
+        'Mango',
+        'Paddy',
+        'Potato',
+        'Tea',
+        'Tobacco']
+
     const prediction = await model.predict(image);
     const output = prediction.argMax(1).arraySync()[0];
-    return output;
+    return datatanaman[output];
 }
 
 
@@ -78,7 +90,6 @@ app.get('/', async (request, reply) => {
 // Endpoint untuk prediksi gambar
 app.get('/predict', async (req, res) => {
 
-
     let imageurl = req.query.imageurl;
     let imagename = req.query.imagename;
     let imagePath = `tmp/gambar/${imagename}.jpg`
@@ -97,7 +108,8 @@ app.get('/predict', async (req, res) => {
         const output = await predictImage(model, image);
 
         // Mengirimkan hasil prediksi sebagai respons
-        res.send({ prediction: output });
+        // res.send({ output });
+        return output
     } catch (err) {
         console.error('Terjadi kesalahan: ulangi pemotretan');
         res.status(500).send({ error: 'Terjadi kesalahan saat memproses permintaan' });

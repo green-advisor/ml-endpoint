@@ -5,7 +5,7 @@ const fetch = require('node-fetch');
 const path = require('path');
 
 const app = fastify();
-const port = 3000;
+const port = 8000;
 
 // Mendefinisikan fungsi untuk memuat model dari file JSON
 async function loadModel(modelPath) {

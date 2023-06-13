@@ -1,22 +1,25 @@
-# Menggunakan image Node.js versi 14 sebagai dasar
-FROM node:14
+# Menggunakan image Node.js versi terbaru sebagai base image
+FROM node:latest
 
-# Set direktori kerja di dalam kontainer
+# Mengatur direktori kerja di dalam container
 WORKDIR /app
 
+# install 
 RUN apt-get update && apt-get install -y nano
 
-# Menyalin package.json dan package-lock.json ke dalam kontainer
+# Menyalin package.json dan package-lock.json (jika ada) ke dalam container
 COPY package*.json ./
 
-# Menjalankan perintah npm install untuk menginstal dependensi
-RUN npm install
+# Menginstal dependensi yang diperlukan
+RUN npm ci --only=production
 
-# Menyalin semua file sumber ke dalam kontainer
+# Menyalin kode aplikasi ke dalam container
 COPY . .
 
-# Menentukan port yang akan digunakan oleh aplikasi
+# Menjalankan perintah untuk memulai aplikasi
+CMD ["node", "app.js"]
+
+# Menyatakan port yang akan di-EXPOSE
 EXPOSE 3000
 
-# Menjalankan perintah untuk menjalankan aplikasi
-CMD [ "node", "app.js" ]
+

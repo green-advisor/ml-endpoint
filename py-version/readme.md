@@ -1,7 +1,5 @@
 # Flask Project
 
-## 📌 About
-This is a simple Flask application that serves as a basic API or web service.
 
 ## 🚀 Installation
 
